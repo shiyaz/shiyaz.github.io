@@ -168,7 +168,7 @@ class LotteryWheel {
 		const rawWinningSegmentIndex = Math.floor((360 - spunDegrees + this.markerOffset) % 360 / degreesPerSegment);
 		const winningSegmentIndex = rawWinningSegmentIndex >= 0 ? rawWinningSegmentIndex : this.numSegments + rawWinningSegmentIndex;
 		const winningSegment = this.segments[winningSegmentIndex];
-		this.resultElement.textContent = `${winningSegment} wins!`;
+		this.resultElement.textContent = `${winningSegment} is the lucky winner!`;
 		this.spinning = false;
 		showFortune(footerTextElement);
 	}
