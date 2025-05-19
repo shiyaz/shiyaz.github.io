@@ -103,8 +103,9 @@ footer {
 
 #container-result {
     margin-top: 20px;
-    font-size: 2.4em;
+    font-size: 2.0em;
     font-weight: bold;
+    z-index: -10;
 }
 
 @media (max-width: 600px) {
