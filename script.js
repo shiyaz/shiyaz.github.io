@@ -75,7 +75,14 @@ class LotteryWheel {
 	}
 
 	getSegmentsFromInput() {
-		return this.inputSegmentsElement.value.split('\n').map(line => line.trim()).filter(line => line !== '');
+		return this.inputSegmentsElement.value.split('\n').map(line => {
+			const trimmed = line.trim();
+			if (trimmed) {
+				const lower = trimmed.toLowerCase();
+				return lower.charAt(0).toUpperCase() + lower.slice(1);
+			}
+			return '';
+		}).filter(line => line !== '');
 	}
 
 	renderSegments() {
