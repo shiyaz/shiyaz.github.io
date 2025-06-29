@@ -170,7 +170,6 @@ class LotteryWheel {
 		const winningSegment = this.segments[winningSegmentIndex];
 		this.resultElement.innerHTML = `🎉 <span style="font-weight: bold; color: #ff4757;">${winningSegment}</span> is the lucky winner! 🥳`;
 		this.spinning = false;
-		showFortune(footerTextElement);
 	}
 }
 
