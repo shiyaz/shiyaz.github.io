@@ -40,10 +40,37 @@ async function getFortune(fortuneFileUrl) {
 	}
 }
 
+function breakLongLines(text, element, maxWidth) {
+    const words = text.split(' ');
+    let line = '';
+    let result = '';
+
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    context.font = getComputedStyle(element).font;
+
+    for (const word of words) {
+        const testLine = line + (line ? ' ' : '') + word;
+        const testWidth = context.measureText(testLine).width;
+
+        if (testWidth > maxWidth && line) {
+            result += line + '<br>';
+            line = word;
+        } else {
+            line = testLine;
+        }
+    }
+    result += line;
+    return result;
+}
+
 function showFortune(el) {
 	getFortune('fortunes')
 		.then(fortune => {
-			el.innerHTML = fortune.replace('.', '. ').replace('\n', '').replaceAll('. ', '<br>');
+			const formattedFortune = fortune.replaceAll('\n', ' ').replaceAll('.', '.<br>');
+			const footer = document.querySelector('footer');
+			const maxWidth = footer.clientWidth - 40;
+			el.innerHTML = breakLongLines(formattedFortune.replaceAll('<br>', ' '), el, maxWidth);
 		});
 }
 
