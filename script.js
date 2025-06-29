@@ -68,8 +68,8 @@ function showFortune(el) {
 	getFortune('fortunes')
 		.then(fortune => {
 			let text = fortune.replaceAll('\n', ' ').trim();
-			// Add line breaks after sentence-ending punctuation, but not if it's part of an ellipsis or a URL-like string
-			text = text.replace(/(?<!\.)([.?!])(?![.?!'"])/g, '$1<br>');
+			// Add line breaks after sentence-ending punctuation, but not if it's part of an ellipsis, a URL-like string, or inside parentheses
+			text = text.replace(/(?<!\.)([.?!])(?![.?!'"]|\))/g, '$1<br>');
 
 			const footer = document.querySelector('footer');
 			const maxWidth = footer.clientWidth - 40; // Adjust for padding
