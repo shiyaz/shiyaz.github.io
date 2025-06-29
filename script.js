@@ -137,7 +137,7 @@ class LotteryWheel {
 	}
 
 	getSegmentColor(index) {
-		const colors = ['#e74c3c', '#f39c12', '#3498db', '#2ecc71', '#9b59b6', '#1abc9c', '#f1c40f', '#e67e22'];
+		const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FED766', '#2AB7CA', '#F0CF65', '#FE4A49', '#2C3E50'];
 		return colors[index % colors.length];
 	}
 
@@ -168,7 +168,7 @@ class LotteryWheel {
 		const rawWinningSegmentIndex = Math.floor((360 - spunDegrees + this.markerOffset) % 360 / degreesPerSegment);
 		const winningSegmentIndex = rawWinningSegmentIndex >= 0 ? rawWinningSegmentIndex : this.numSegments + rawWinningSegmentIndex;
 		const winningSegment = this.segments[winningSegmentIndex];
-		this.resultElement.textContent = `${winningSegment} is the lucky winner!`;
+		this.resultElement.innerHTML = `🎉 <span style="font-weight: bold; color: #ff4757;">${winningSegment}</span> is the lucky winner! 🥳`;
 		this.spinning = false;
 		showFortune(footerTextElement);
 	}
