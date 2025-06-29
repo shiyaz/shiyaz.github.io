@@ -205,6 +205,8 @@ class LotteryWheel {
 
 	stopSpin() {
 		this.wheelElement.style.transition = 'none';
+		const finalRotation = this.rotation;
+		this.wheelElement.style.transform = `rotate(${finalRotation}deg)`;
 		const degreesPerSegment = 360 / this.numSegments;
 		const spunDegrees = this.rotation % 360;
 		const rawWinningSegmentIndex = Math.floor((360 - spunDegrees + this.markerOffset) % 360 / degreesPerSegment);
