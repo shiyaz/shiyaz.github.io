@@ -179,7 +179,7 @@ class LotteryWheel {
 	}
 
 	getSegmentColor(index) {
-		const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FED766', '#2AB7CA', '#F0CF65', '#FE4A49', '#2C3E50'];
+		const colors = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00'];
 		return colors[index % colors.length];
 	}
 
