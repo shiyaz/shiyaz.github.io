@@ -150,10 +150,10 @@ class LotteryWheel {
 		this.resultElement.textContent = '';
 		const randomSpins = 5 + Math.random() * 15;
 		this.rotation += 360 * randomSpins;
-		const decelerationTime = 5000;
-		const easeOutCubic = 'cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+		const decelerationTime = 8000;
+		const easeOut = 'ease-out';
 
-		this.wheelElement.style.transition = `transform ${decelerationTime}ms ${easeOutCubic}`;
+		this.wheelElement.style.transition = `transform ${decelerationTime}ms ${easeOut}`;
 		this.wheelElement.style.transform = `rotate(${this.rotation}deg)`;
 
 		setTimeout(() => {
