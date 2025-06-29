@@ -43,7 +43,7 @@ async function getFortune(fortuneFileUrl) {
 function showFortune(el) {
 	getFortune('fortunes')
 		.then(fortune => {
-			el.innerHTML = fortune.split('\n').join('<br>');
+			el.innerHTML = fortune.replace('.', '. ').replace('\n', '').replaceAll('. ', '<br>');
 		});
 }
 
