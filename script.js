@@ -67,10 +67,18 @@ function breakLongLines(text, element, maxWidth) {
 function showFortune(el) {
 	getFortune('fortunes')
 		.then(fortune => {
-			const formattedFortune = fortune.replaceAll('\n', ' ').replaceAll('.', '.<br>');
+			let text = fortune.replaceAll('\n', ' ').trim();
+			// Add line breaks after sentence-ending punctuation
+			text = text.replace(/([.?!])(\s*)/g, '$1$2<br>');
+
 			const footer = document.querySelector('footer');
-			const maxWidth = footer.clientWidth - 40;
-			el.innerHTML = breakLongLines(formattedFortune.replaceAll('<br>', ' '), el, maxWidth);
+			const maxWidth = footer.clientWidth - 40; // Adjust for padding
+
+			// For each segment created by a punctuation break, apply word wrapping if it's too long
+			const lines = text.split('<br>');
+			const wrappedLines = lines.map(line => breakLongLines(line.trim(), el, maxWidth));
+
+			el.innerHTML = wrappedLines.join('<br>');
 		});
 }
 
