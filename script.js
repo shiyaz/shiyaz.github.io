@@ -3,16 +3,7 @@ let fortunes = null;
 
 const footerTextElement = document.getElementById('footer-text');
 
-function getQueryParams() {
-	const urlParams = new URLSearchParams(window.location.search);
-	const params = {};
-	for (const [key, value] of urlParams.entries()) {
-		params[key] = value;
-	}
-	return params;
-}
 
-const queryParams = getQueryParams();
 
 async function getFortune(fortuneFileUrl) {
 	try {
@@ -101,9 +92,6 @@ class LotteryWheel {
 
 		this.spinButton.addEventListener('click', () => {
 			if (!this.spinning) {
-				this.segments = this.getSegmentsFromInput();
-				this.numSegments = this.segments.length;
-				this.renderSegments();
 				this.spin();
 			}
 		});
@@ -222,8 +210,15 @@ const buttonSpin = document.getElementById('button-spin');
 const resultElement = document.getElementById('container-result');
 const inputSegmentsElement = document.getElementById('input-names');
 
-inputSegmentsElement.textContent = Object.keys(queryParams).join('\n');
+const storedNames = localStorage.getItem('segmentNames');
+if (storedNames) {
+	inputSegmentsElement.value = storedNames;
+}
 
 const myWheel = new LotteryWheel(wheelElement, buttonSpin, resultElement, inputSegmentsElement);
+
+myWheel.spinButton.addEventListener('click', () => {
+	localStorage.setItem('segmentNames', inputSegmentsElement.value);
+});
 
 showFortune(footerTextElement);
