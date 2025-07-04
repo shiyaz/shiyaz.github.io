@@ -221,4 +221,18 @@ myWheel.spinButton.addEventListener('click', () => {
 	localStorage.setItem('segmentNames', inputSegmentsElement.value);
 });
 
+inputSegmentsElement.addEventListener('input', () => {
+    myWheel.segments = myWheel.getSegmentsFromInput();
+    myWheel.numSegments = myWheel.segments.length;
+    myWheel.renderSegments();
+    localStorage.setItem('segmentNames', inputSegmentsElement.value);
+});
+
+const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebar-toggle');
+
+sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+});
+
 showFortune(footerTextElement);
