@@ -113,7 +113,7 @@ main {
 #input-names {
     padding: 12px;
     font-size: 1em;
-    border: 1.5px solid #b5e7a0;
+    border: none;
     border-radius: 8px;
     box-sizing: border-box;
     width: 100%;
@@ -128,7 +128,7 @@ main {
     flex: none;
 }
 #input-names:focus {
-    border: 2px solid #89bda5;
+    border: none;
     outline: none;
 }
 
