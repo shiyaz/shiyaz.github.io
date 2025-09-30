@@ -48,7 +48,12 @@ footer {
 footer .marquee p,
 footer p {
     color: #ffe066;
-    text-shadow: 0 0 8px #ffe066, 0 0 16px #ffd700, 0 0 24px #ffd700;
+    text-shadow:
+        0 0 2px #000,
+        0 0 1px #000,
+        1px 1px 0 #000,
+        -1px -1px 0 #000,
+        0 0 8px #ffe066;
 }
 
 main {
