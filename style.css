@@ -120,8 +120,10 @@ main {
     left: 0;
     top: 70px;
     bottom: 70px;
-    overflow-y: auto;
-    max-height: calc(100vh - 70px - 60px);
+    overflow-y: visible; /* Remove internal scrolling */
+    max-height: none;
+    height: auto;
+    min-height: unset;
     width: 220px;
     background: rgba(255,255,255,0.97);
     padding: 18px 12px 12px 12px;
@@ -140,9 +142,9 @@ main {
     display: none;
 }
 #sidebar-toggle {
-    position: absolute;
-    top: 10px;
-    right: -32px;
+    position: fixed;
+    left: 220px;
+    top: 90px;
     width: 32px;
     height: 32px;
     background: linear-gradient(135deg, #ff4757 60%, #ff7e5f 100%);
@@ -153,9 +155,13 @@ main {
     font-size: 1.3em;
     box-shadow: 1px 2px 6px rgba(0,0,0,0.08);
     transition: background 0.2s;
+    z-index: 20;
 }
 #sidebar-toggle:hover {
     background: linear-gradient(135deg, #ff7e5f 60%, #ff4757 100%);
+}
+#sidebar.collapsed #sidebar-toggle {
+    left: 40px;
 }
 
 .container-spinner {
@@ -231,6 +237,17 @@ main {
         min-width: 120px;
         max-width: 90vw;
         padding: 8px 4px 8px 4px;
+        overflow-y: visible;
+        max-height: none;
+        height: auto;
+        min-height: unset;
+    }
+    #sidebar-toggle {
+        left: 60vw;
+        top: 90px;
+    }
+    #sidebar.collapsed #sidebar-toggle {
+        left: 40px;
     }
     #container-result {
         font-size: 1.2em;
