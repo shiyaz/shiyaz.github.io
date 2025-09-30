@@ -2,7 +2,14 @@ body {
     font-family: 'Segoe UI', Arial, sans-serif;
     line-height: 1.6;
     min-height: 100vh;
-    background: linear-gradient(120deg, #b5cfa0 0%, #7a8f7a 100%);
+    background-color: #b5cfa0;
+    background-image:
+        repeating-linear-gradient(135deg, #7a8f7a 0 10px, transparent 10px 20px),
+        repeating-linear-gradient(45deg, #b5e7a0 0 10px, transparent 10px 20px),
+        repeating-linear-gradient(135deg, rgba(60,80,60,0.15) 0 2px, transparent 2px 40px),
+        repeating-linear-gradient(45deg, rgba(60,80,60,0.15) 0 2px, transparent 2px 40px);
+    background-size: 80px 80px, 80px 80px, 40px 40px, 40px 40px;
+    background-position: 0 0, 40px 40px, 0 0, 20px 20px;
     margin: 0;
     padding: 0;
     display: flex;
