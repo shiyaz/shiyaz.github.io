@@ -153,9 +153,9 @@ main {
     display: none;
 }
 #sidebar-toggle {
-    position: fixed;
-    left: 220px;
-    top: 90px;
+    position: absolute;
+    top: 0;
+    right: -32px;
     width: 32px;
     height: 32px;
     background: linear-gradient(135deg, #ff4757 60%, #ff7e5f 100%);
