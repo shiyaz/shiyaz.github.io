@@ -47,13 +47,13 @@ footer {
 
 footer .marquee p,
 footer p {
-    color: #ffe066;
+    color: #ffd0d0;
     text-shadow:
         0 0 2px #000,
         0 0 1px #000,
         1px 1px 0 #000,
         -1px -1px 0 #000,
-        0 0 8px #ffe066;
+        0 0 8px #ffd0d0;
 }
 
 main {
@@ -124,7 +124,8 @@ main {
     width: 100%;
     min-height: 120px;
     resize: vertical;
-    background: #f8fff8;
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(2px);
     margin-bottom: 8px;
     transition: border 0.2s;
 }
