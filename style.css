@@ -126,8 +126,10 @@ main {
     resize: vertical;
     background: rgba(255,255,255,0.18);
     backdrop-filter: blur(2px);
-    margin-bottom: 8px;
+    margin-bottom: 0;
     transition: border 0.2s;
+    flex: 1 1 auto;
+    height: 100%;
 }
 #input-names:focus {
     border: 2px solid #89bda5;
@@ -153,6 +155,7 @@ main {
     z-index: 5;
     display: flex;
     flex-direction: column;
+    height: 100%;
     gap: 12px;
 }
 #sidebar.collapsed {
