@@ -20,7 +20,7 @@ header {
     padding: 16px 0 8px 0;
     z-index: 10;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: none;
     backdrop-filter: blur(4px);
 }
 
@@ -35,7 +35,7 @@ footer {
     text-align: left;
     background: transparent;
     overflow: hidden;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+    box-shadow: none;
     font-size: 1em;
 }
 
