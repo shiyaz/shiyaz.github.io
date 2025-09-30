@@ -29,7 +29,7 @@ footer {
     color: #888;
     padding: 10px 0;
     z-index: 1;
-    text-align: center;
+    text-align: left;
     background-color: rgba(255, 255, 255, 0.8);
     overflow: hidden;
 }
@@ -105,7 +105,10 @@ footer {
     position: fixed;
     left: 0;
     top: 60px; /* Adjust based on header height */
-    bottom: 60px; /* Adjust based on footer height */
+    bottom: 120px; /* Adjust based on footer height */
+    overflow-y: auto;
+    /* The following ensures the sidebar never overlaps the footer */
+    max-height: calc(100vh - 60px - 50px); /* header height + footer height */
     width: 250px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 10px;
