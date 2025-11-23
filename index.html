@@ -7,23 +7,29 @@
   <title>::huddle boss::</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
   <header>
-    <div id="container-result"></div>
+    <div id="container-result" aria-live="polite"></div>
   </header>
 
-  <div id="sidebar">
-    <button id="sidebar-toggle">☰</button>
-    <textarea id="input-names" rows="5" cols="30" placeholder="Enter names, one per line"></textarea>
-  </div>
+  <aside id="sidebar" aria-label="Settings">
+    <button id="sidebar-toggle" aria-label="Toggle Sidebar">☰</button>
+    <div class="sidebar-content">
+      <h3>Participants</h3>
+      <textarea id="input-names" rows="5" cols="30" placeholder="Enter names, one per line"></textarea>
+    </div>
+  </aside>
 
   <main>
-    <section>
+    <section class="wheel-section">
       <div class="container-wheel">
         <div class="container-wheel-shadow">
-          <svg class="svg-wheel" viewBox="0 0 200 200"></svg>
+          <svg class="svg-wheel" viewBox="0 0 200 200" aria-label="Lottery Wheel"></svg>
         </div>
         <div class="container-spinner"></div>
         <button id="button-spin">Spin</button>

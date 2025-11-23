@@ -1,238 +1,267 @@
-let fortunesText = null;
-let fortunes = null;
+const FORTUNE_FILE_URL = 'fortunes';
+const WHEEL_RADIUS = 95;
+const WHEEL_CENTER_X = 100;
+const WHEEL_CENTER_Y = 100;
+const MARKER_OFFSET_DEGREES = -90;
+const DEGREES_IN_CIRCLE = 360;
+const SPIN_DECELERATION_TIME_MS = 8000;
+const SPIN_EASING = 'ease-out';
 
-const footerTextElement = document.getElementById('footer-text');
+const SEGMENT_COLORS = [
+	'#FF4136', '#0074D9', '#2ECC40', '#FFDC00',
+	'#B10DC9', '#FF851B', '#39CCCC', '#F012BE',
+	'#01FF70', '#7FDBFF', '#85144b', '#001f3f',
+	'#3D9970', '#FFD700', '#FF69B4', '#4B0082'
+];
 
+let rawFortuneContent = null;
+let fortuneCollection = null;
 
-
-async function getFortune(fortuneFileUrl) {
+async function fetchRandomFortune(url) {
 	try {
-		if (fortunesText == null) {
-			const response = await fetch(fortuneFileUrl);
+		if (rawFortuneContent == null) {
+			const response = await fetch(url);
 
 			if (!response.ok) {
 				throw new Error(`Failed to fetch fortunes: ${response.status}`);
 			}
 
-			fortunesText = await response.text();
-			fortunes = fortunesText.split('\n%\n').map(fortune => fortune.trim()).filter(fortune => fortune !== '');
+			rawFortuneContent = await response.text();
+			fortuneCollection = rawFortuneContent.split('\n%\n')
+				.map(fortune => fortune.trim())
+				.filter(fortune => fortune !== '');
 		}
 
-		if (fortunes.length === 0) {
+		if (fortuneCollection.length === 0) {
 			return "---";
 		}
 
-		const randomIndex = Math.floor(Math.random() * fortunes.length);
-
-		return fortunes[randomIndex];
+		const randomIndex = Math.floor(Math.random() * fortuneCollection.length);
+		return fortuneCollection[randomIndex];
 
 	} catch (error) {
+		console.error("Error getting fortune:", error);
 		return "!!!";
 	}
 }
 
-function breakLongLines(text, element, maxWidth) {
-    const words = text.split(' ');
-    let line = '';
-    let result = '';
+function wrapTextWithBreaks(text, element, maxWidth) {
+	const words = text.split(' ');
+	let currentLine = '';
+	let result = '';
 
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    context.font = getComputedStyle(element).font;
+	const canvas = document.createElement('canvas');
+	const context = canvas.getContext('2d');
+	context.font = getComputedStyle(element).font;
 
-    for (const word of words) {
-        const testLine = line + (line ? ' ' : '') + word;
-        const testWidth = context.measureText(testLine).width;
+	for (const word of words) {
+		const testLine = currentLine + (currentLine ? ' ' : '') + word;
+		const testWidth = context.measureText(testLine).width;
 
-        if (testWidth > maxWidth && line) {
-            result += line + '<br>';
-            line = word;
-        } else {
-            line = testLine;
-        }
-    }
-    result += line;
-    return result;
+		if (testWidth > maxWidth && currentLine) {
+			result += currentLine + '<br>';
+			currentLine = word;
+		} else {
+			currentLine = testLine;
+		}
+	}
+	result += currentLine;
+	return result;
 }
 
-function showFortune(el) {
-	getFortune('fortunes')
+function displayFortuneInFooter(element) {
+	fetchRandomFortune(FORTUNE_FILE_URL)
 		.then(fortune => {
 			let text = fortune.replaceAll('\n', ' ').trim();
-			// Add line breaks after sentence-ending punctuation, but not if it's part of an ellipsis, a URL-like string, or inside parentheses
+
 			text = text.replace(/(?<!\.)([.?!])(?![.?!'"]|\))/g, '$1<br>');
 
 			const footer = document.querySelector('footer');
-			const maxWidth = footer.clientWidth - 40; // Adjust for padding
+			const maxWidth = footer.clientWidth - 40;
 
-			// For each segment created by a punctuation break, apply word wrapping if it's too long
 			const lines = text.split('<br>');
-			const wrappedLines = lines.map(line => breakLongLines(line.trim(), el, maxWidth));
+			const wrappedLines = lines.map(line => wrapTextWithBreaks(line.trim(), element, maxWidth));
 
-			el.innerHTML = wrappedLines.join('<br>');
+			element.innerHTML = wrappedLines.join('<br>');
 		});
 }
 
 class LotteryWheel {
-	constructor(wheelElement, spinButton, resultElement, inputSegmentsElement) {
-		this.wheelElement = wheelElement;
-		this.spinButton = spinButton;
-		this.resultElement = resultElement;
-		this.inputSegmentsElement = inputSegmentsElement;
-		this.segments = this.getSegmentsFromInput();
+	constructor(wheelSvg, triggerButton, resultDisplay, inputArea) {
+		this.wheelSvg = wheelSvg;
+		this.triggerButton = triggerButton;
+		this.resultDisplay = resultDisplay;
+		this.inputArea = inputArea;
+
+		this.segments = this.parseInputSegments();
 		this.numSegments = this.segments.length;
-		this.spinning = false;
-		this.rotation = 0;
-		this.radius = 95;
-		this.centerX = 100;
-		this.centerY = 100;
-		this.markerOffset = -90;
+		this.isSpinning = false;
+		this.currentRotation = 0;
 
-		this.renderSegments();
+		this.drawWheel();
+		this.setupEventListeners();
+	}
 
-		this.spinButton.addEventListener('click', () => {
-			if (!this.spinning) {
+	setupEventListeners() {
+		this.triggerButton.addEventListener('click', () => {
+			if (!this.isSpinning) {
 				this.spin();
 			}
 		});
 	}
 
-	getSegmentsFromInput() {
-		return this.inputSegmentsElement.value.split('\n').map(line => {
-			const trimmed = line.trim();
-			if (trimmed) {
-				const lower = trimmed.toLowerCase();
-				return lower.charAt(0).toUpperCase() + lower.slice(1);
-			}
-			return '';
-		}).filter(line => line !== '');
+	parseInputSegments() {
+		return this.inputArea.value.split('\n')
+			.map(line => {
+				const trimmed = line.trim();
+				if (trimmed) {
+					const lower = trimmed.toLowerCase();
+					return lower.charAt(0).toUpperCase() + lower.slice(1);
+				}
+				return '';
+			})
+			.filter(line => line !== '');
 	}
 
-	renderSegments() {
-		while (this.wheelElement.firstChild) {
-			this.wheelElement.removeChild(this.wheelElement.firstChild);
+	drawWheel() {
+		while (this.wheelSvg.firstChild) {
+			this.wheelSvg.removeChild(this.wheelSvg.firstChild);
 		}
 
-		if (this.segments.length == 0) {
+		if (this.segments.length === 0) {
 			return;
 		}
 
 		this.segments.forEach((segment, index) => {
-			const angleStart = (360 / this.numSegments) * index;
-			const angleEnd = (360 / this.numSegments) * (index + 1);
-			const midAngleDegrees = (angleStart + angleEnd) / 2;
-			const midAngleRadians = midAngleDegrees * Math.PI / 180;
-			const segmentAngleRadians = (angleEnd - angleStart) * Math.PI / 180;
-
-			const largeArcFlag = angleEnd - angleStart <= 180 ? 0 : 1;
-			const startX = this.centerX + this.radius * Math.cos(Math.PI * angleStart / 180);
-			const startY = this.centerY + this.radius * Math.sin(Math.PI * angleStart / 180);
-			const endX = this.centerX + this.radius * Math.cos(Math.PI * angleEnd / 180);
-			const endY = this.centerY + this.radius * Math.sin(Math.PI * angleEnd / 180);
-
-			const pathD = `M ${this.centerX},${this.centerY} L ${startX},${startY} A ${this.radius},${this.radius} 0 ${largeArcFlag},1 ${endX},${endY} Z`;
-
-			const segmentElement = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-			segmentElement.classList.add('segment');
-
-			const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-			path.classList.add('segment-path');
-			path.setAttribute('d', pathD);
-			path.setAttribute('fill', this.getSegmentColor(index));
-
-			const textRadius = this.radius * 0.85;
-			const textX = this.centerX + textRadius * Math.cos(midAngleRadians);
-			const textY = this.centerY + textRadius * Math.sin(midAngleRadians);
-
-			const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-			text.classList.add('segment-text');
-			text.setAttribute('x', textX);
-			text.setAttribute('y', textY);
-			text.setAttribute('text-anchor', 'middle');
-			text.setAttribute('dominant-baseline', 'central');
-			text.style.transformOrigin = `${textX}px ${textY}px`;
-
-			text.style.transform = `rotate(${midAngleDegrees + 90}deg)`;
-			text.textContent = segment;
-
-			const approximateTextWidth = segment.length * 10;
-			const availableWidth = this.radius * Math.sin(segmentAngleRadians / 2) * 2 * 0.7;
-			const scaleFactor = Math.min(1, availableWidth / approximateTextWidth);
-			text.style.fontSize = `${1.2 * scaleFactor}em`;
-
-			segmentElement.appendChild(path);
-			segmentElement.appendChild(text);
-			this.wheelElement.appendChild(segmentElement);
+			this.drawSegment(segment, index);
 		});
 	}
 
-	getSegmentColor(index) {
-		const colors = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928', '#fbb4ae', '#b3cde3', '#ccebc5', '#decbe4'];
-		return colors[index % colors.length];
+	drawSegment(segmentText, index) {
+		const angleStart = (DEGREES_IN_CIRCLE / this.numSegments) * index;
+		const angleEnd = (DEGREES_IN_CIRCLE / this.numSegments) * (index + 1);
+		const midAngleDegrees = (angleStart + angleEnd) / 2;
+		const midAngleRadians = midAngleDegrees * Math.PI / 180;
+		const segmentAngleRadians = (angleEnd - angleStart) * Math.PI / 180;
+
+		const startX = WHEEL_CENTER_X + WHEEL_RADIUS * Math.cos(Math.PI * angleStart / 180);
+		const startY = WHEEL_CENTER_Y + WHEEL_RADIUS * Math.sin(Math.PI * angleStart / 180);
+		const endX = WHEEL_CENTER_X + WHEEL_RADIUS * Math.cos(Math.PI * angleEnd / 180);
+		const endY = WHEEL_CENTER_Y + WHEEL_RADIUS * Math.sin(Math.PI * angleEnd / 180);
+		const largeArcFlag = angleEnd - angleStart <= 180 ? 0 : 1;
+
+		const pathD = `M ${WHEEL_CENTER_X},${WHEEL_CENTER_Y} L ${startX},${startY} A ${WHEEL_RADIUS},${WHEEL_RADIUS} 0 ${largeArcFlag},1 ${endX},${endY} Z`;
+
+		const segmentGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+		segmentGroup.classList.add('segment');
+
+		const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		path.classList.add('segment-path');
+		path.setAttribute('d', pathD);
+		path.setAttribute('fill', this.getColorForIndex(index));
+
+		const textRadius = WHEEL_RADIUS * 0.85;
+		const textX = WHEEL_CENTER_X + textRadius * Math.cos(midAngleRadians);
+		const textY = WHEEL_CENTER_Y + textRadius * Math.sin(midAngleRadians);
+
+		const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+		text.classList.add('segment-text');
+		text.setAttribute('x', textX);
+		text.setAttribute('y', textY);
+		text.setAttribute('text-anchor', 'middle');
+		text.setAttribute('dominant-baseline', 'central');
+		text.style.transformOrigin = `${textX}px ${textY}px`;
+		text.style.transform = `rotate(${midAngleDegrees + 90}deg)`;
+		text.textContent = segmentText;
+
+		const approximateTextWidth = segmentText.length * 10;
+		const availableWidth = WHEEL_RADIUS * Math.sin(segmentAngleRadians / 2) * 2 * 0.7;
+		const scaleFactor = Math.min(1, availableWidth / approximateTextWidth);
+		text.style.fontSize = `${1.2 * scaleFactor}em`;
+
+		segmentGroup.appendChild(path);
+		segmentGroup.appendChild(text);
+		this.wheelSvg.appendChild(segmentGroup);
+	}
+
+	getColorForIndex(index) {
+		return SEGMENT_COLORS[index % SEGMENT_COLORS.length];
 	}
 
 	spin() {
-		if (this.segments.length == 0) {
+		if (this.segments.length === 0) {
 			return;
 		}
 
-		this.spinning = true;
-		this.resultElement.textContent = '';
-		const randomSpins = 5 + Math.random() * 15;
-		this.rotation += 360 * randomSpins;
-		const decelerationTime = 8000;
-		const easeOut = 'ease-out';
+		this.isSpinning = true;
+		this.resultDisplay.textContent = '';
 
-		this.wheelElement.style.transition = `transform ${decelerationTime}ms ${easeOut}`;
-		this.wheelElement.style.transform = `rotate(${this.rotation}deg)`;
+		const randomSpins = 5 + Math.random() * 15;
+		this.currentRotation += DEGREES_IN_CIRCLE * randomSpins;
+
+		this.wheelSvg.style.transition = `transform ${SPIN_DECELERATION_TIME_MS}ms ${SPIN_EASING}`;
+		this.wheelSvg.style.transform = `rotate(${this.currentRotation}deg)`;
 
 		setTimeout(() => {
 			this.stopSpin();
-		}, decelerationTime);
+		}, SPIN_DECELERATION_TIME_MS);
 	}
 
 	stopSpin() {
-		this.wheelElement.style.transition = 'none';
-		const finalRotation = this.rotation;
-		this.wheelElement.style.transform = `rotate(${finalRotation}deg)`;
-		const degreesPerSegment = 360 / this.numSegments;
-		const spunDegrees = this.rotation % 360;
-		const rawWinningSegmentIndex = Math.floor((360 - spunDegrees + this.markerOffset) % 360 / degreesPerSegment);
-		const winningSegmentIndex = rawWinningSegmentIndex >= 0 ? rawWinningSegmentIndex : this.numSegments + rawWinningSegmentIndex;
-		const winningSegment = this.segments[winningSegmentIndex];
-		this.resultElement.innerHTML = `🎉 <span style="font-weight: bold; color: #ff4757;">${winningSegment}</span> is the lucky winner! 🥳`;
-		this.spinning = false;
+		this.wheelSvg.style.transition = 'none';
+
+		this.wheelSvg.style.transform = `rotate(${this.currentRotation}deg)`;
+
+		const degreesPerSegment = DEGREES_IN_CIRCLE / this.numSegments;
+		const spunDegrees = this.currentRotation % DEGREES_IN_CIRCLE;
+
+		const rawWinningIndex = Math.floor((DEGREES_IN_CIRCLE - spunDegrees + MARKER_OFFSET_DEGREES) % DEGREES_IN_CIRCLE / degreesPerSegment);
+
+		const winningIndex = rawWinningIndex >= 0 ? rawWinningIndex : this.numSegments + rawWinningIndex;
+
+		const winningSegment = this.segments[winningIndex];
+		this.resultDisplay.innerHTML = `🎉 <span style="font-weight: bold; color: #ff4757;">${winningSegment}</span> is the lucky winner! 🥳`;
+
+		this.isSpinning = false;
 	}
 }
 
-const wheelElement = document.querySelector('.svg-wheel');
-const buttonSpin = document.getElementById('button-spin');
-const resultElement = document.getElementById('container-result');
-const inputSegmentsElement = document.getElementById('input-names');
+function init() {
+	const wheelSvg = document.querySelector('.svg-wheel');
+	const triggerButton = document.getElementById('button-spin');
+	const resultDisplay = document.getElementById('container-result');
+	const inputArea = document.getElementById('input-names');
+	const footerTextElement = document.getElementById('footer-text');
+	const sidebar = document.getElementById('sidebar');
+	const sidebarToggle = document.getElementById('sidebar-toggle');
 
-const storedNames = localStorage.getItem('segmentNames');
-if (storedNames) {
-	inputSegmentsElement.value = storedNames;
+	const storedNames = localStorage.getItem('segmentNames');
+	if (storedNames) {
+		inputArea.value = storedNames;
+	}
+
+	const myWheel = new LotteryWheel(wheelSvg, triggerButton, resultDisplay, inputArea);
+
+	myWheel.triggerButton.addEventListener('click', () => {
+		localStorage.setItem('segmentNames', inputArea.value);
+	});
+
+	inputArea.addEventListener('input', () => {
+		myWheel.segments = myWheel.parseInputSegments();
+		myWheel.numSegments = myWheel.segments.length;
+		myWheel.drawWheel();
+		localStorage.setItem('segmentNames', inputArea.value);
+	});
+
+	sidebarToggle.addEventListener('click', () => {
+		sidebar.classList.toggle('collapsed');
+	});
+
+	displayFortuneInFooter(footerTextElement);
 }
 
-const myWheel = new LotteryWheel(wheelElement, buttonSpin, resultElement, inputSegmentsElement);
-
-myWheel.spinButton.addEventListener('click', () => {
-	localStorage.setItem('segmentNames', inputSegmentsElement.value);
-});
-
-inputSegmentsElement.addEventListener('input', () => {
-    myWheel.segments = myWheel.getSegmentsFromInput();
-    myWheel.numSegments = myWheel.segments.length;
-    myWheel.renderSegments();
-    localStorage.setItem('segmentNames', inputSegmentsElement.value);
-});
-
-const sidebar = document.getElementById('sidebar');
-const sidebarToggle = document.getElementById('sidebar-toggle');
-
-sidebarToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-});
-
-showFortune(footerTextElement);
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', init);
+} else {
+	init();
+}
