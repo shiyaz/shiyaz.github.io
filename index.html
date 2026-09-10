@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,600&family=Instrument+Serif:ital@0;1&display=swap">
 
-<link rel="stylesheet" crossorigin href="./index-yv2n0bfc.css"><script type="module" crossorigin src="./index-a8rt7as2.js"></script></head>
+<link rel="stylesheet" crossorigin href="./index-6geadbx6.css"><script type="module" crossorigin src="./index-3hg9hspv.js"></script></head>
 <body>
 <body>
 <div id="floats" aria-hidden="true"></div>
@@ -43,7 +43,7 @@
     <button id="b-join" class="btn go" disabled>Join the quiz</button>
     <p class="note">You will be dropped into one of five mixed teams — half your
       teammates will be 5,100 miles away. <span id="join-count">13</span> questions,
-      about twenty seconds each.</p>
+      about ten seconds each.</p>
   </div>
 
   <div class="spacer"></div>
@@ -75,7 +75,9 @@
   <div class="timerbar" id="p-timerbar"><i id="p-timerfill"></i></div>
   <h2 class="qtext" id="p-qtext"></h2>
   <figure class="qimage hide" id="p-qimage"><img id="p-qimg" alt=""></figure>
+  <p class="pickhint hide" id="p-hint"></p>
   <div class="answers" id="p-answers"></div>
+  <button class="btn go lockbtn hide" id="p-lock">Lock it in</button>
   <div id="p-after" class="hide" style="margin-top:16px">
     <div class="verdict" id="p-verdict"></div>
     <p class="fact" id="p-fact"></p>
@@ -97,6 +99,7 @@
   <div class="hosttop">
     <h1>Pearls &amp; <em>Blue&nbsp;Glass</em></h1>
     <div class="clock">
+      <div><div class="k">Game</div><div class="v" id="h-gamename">friday</div></div>
       <div><div class="k">In the room</div><div class="v tnum" id="h-players">0</div></div>
       <div><div class="k">Elapsed</div><div class="v tnum" id="h-elapsed">0:00</div></div>
     </div>
@@ -111,6 +114,10 @@
         <div class="qrurl" id="h-qrurl"></div>
       </div>
       <div class="panel setup">
+        <div class="f">
+          <label class="fl" for="h-game">Which game</label>
+          <select id="h-game" class="field"></select>
+        </div>
         <div class="f">
           <label class="fl" for="h-url">Join link</label>
           <input id="h-url" class="field" style="font-size:14px" placeholder="https://you.github.io/repo/">
